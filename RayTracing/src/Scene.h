@@ -146,6 +146,7 @@ public:
 	glm::vec3 Direction;
 
 public:
+	Ray() {};
 	Ray(const glm::vec3& Origin, const glm::vec3& Direction) : Origin{ Origin }, Direction{ Direction } {};
 };
 
