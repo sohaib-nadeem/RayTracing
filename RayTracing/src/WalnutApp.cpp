@@ -14,8 +14,13 @@ class ExampleLayer : public Walnut::Layer
 {
 public:
 	ExampleLayer(): m_Camera(45.0f, 0.1f, 100.0f), m_Scene(glm::normalize(glm::vec3(-1, -1, -1))) { // lighting
-		Sphere* sphere1 = new Sphere(glm::vec3(0, 0, 0), 0.5f, glm::vec3(1, 0, 1)); // sphere at origin
-		Sphere* sphere2 = new Sphere(glm::vec3(1, 0, -5), 1.5f, glm::vec3(0, 1, 0)); // sphere at origin
+		Material& pinkMaterial = m_Scene.materials.emplace_back(glm::vec3(1, 0, 1), 0.0f);
+		Material& greenMaterial = m_Scene.materials.emplace_back(glm::vec3(0, 1, 0), 0.1f);
+
+		Sphere* sphere1 = new Sphere(glm::vec3(0, 0, 0), 1.0f); // sphere at origin; (0, 0, 0), 0.5f
+		sphere1->MaterialIndex = 0;
+		Sphere* sphere2 = new Sphere(glm::vec3(0, -101, 0), 100.0f); // sphere at origin; (1, 0, -5), 1.5f
+		sphere2->MaterialIndex = 1;
 		m_Scene.addObject(sphere1);
 		m_Scene.addObject(sphere2);
 	}
@@ -38,6 +43,12 @@ public:
 		for (int i = 0; i < m_Scene.objects.size(); i++) {
 			ImGui::PushID(i);
 			m_Scene.objects[i]->ImGuiParameters();
+			ImGui::PopID();
+			ImGui::Separator();
+		}
+		for (int i = 0; i < m_Scene.materials.size(); i++) {
+			ImGui::PushID(i);
+			m_Scene.materials[i].ImGuiParameters();
 			ImGui::PopID();
 			ImGui::Separator();
 		}

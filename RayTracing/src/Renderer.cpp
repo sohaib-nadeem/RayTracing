@@ -97,12 +97,12 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y) { //similar RayGen in vulka
 	glm::vec3 color(0.0f);
 	float multiplier = 1.0f;
 
-	int bounces = 2;
+	int bounces = 5;
 	for (int i = 0; i < bounces; i++) {
 		Renderer::HitPayload payload = TraceRay(ray);
 
 		if (payload.HitDistance < 0) {
-			glm::vec3 skyColor = glm::vec3(0.0f, 0.0f, 0.0f);
+			glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);
 			color += multiplier * skyColor;
 			multiplier *= 0.7f;
 			break;
@@ -110,16 +110,18 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y) { //similar RayGen in vulka
 
 		float lightIntensity = glm::max(0.0f, glm::dot(payload.WorldNormal, -lightDir));
 		SceneObject* object = m_ActiveScene->objects[payload.ObjectIndex];
-		glm::vec3 sphereColor = object->getAlbedo() * lightIntensity;
-		color += multiplier * sphereColor;
-		multiplier *= 0.7f;
+		const Material& material = m_ActiveScene->materials[object->MaterialIndex];
+		glm::vec3 objectColor = material.Albedo * lightIntensity;
+		color += multiplier * objectColor;
+		multiplier *= 0.5f;
 
 		// bounce ray
 		// move origin a little bit to not intersect again with object we're bouncing off of
 		ray.Origin = payload.WorldPosition + payload.WorldNormal * 0.0001f; 
 		//glm::vec3 oldDirectionProj = glm::dot(ray.Direction, payload.WorldNormal) * payload.WorldNormal;
 		//ray.Direction = payload.WorldNormal * 2.0f + oldDirectionProj;
-		ray.Direction = glm::reflect(ray.Direction, payload.WorldNormal);
+		ray.Direction = glm::reflect(ray.Direction, 
+			payload.WorldNormal + material.Roughness * Walnut::Random::Vec3(-0.5, 0.5));
 	}
 
 	return glm::vec4(color, 1.0f);

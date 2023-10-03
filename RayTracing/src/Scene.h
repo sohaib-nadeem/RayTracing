@@ -150,10 +150,26 @@ public:
 	Ray(const glm::vec3& Origin, const glm::vec3& Direction) : Origin{ Origin }, Direction{ Direction } {};
 };
 
+class Material {
+public:
+	glm::vec3 Albedo{ 1.0f };
+	float Roughness = 1.0f;
+	float Metallic = 0.0f;
+
+	Material(glm::vec3 albedo, float roughness): Albedo(albedo), Roughness(roughness){}
+
+	void ImGuiParameters() {
+		ImGui::ColorEdit3("Albedo", glm::value_ptr(Albedo), 0.1f);
+		ImGui::DragFloat("Roughness", &Roughness, 0.05f, 0.0f, 1.0f);
+		ImGui::DragFloat("Metallic", &Metallic, 0.05f, 0.0f, 1.0f);
+	}
+};
+
 class SceneObject {
 public:
+	int MaterialIndex = 0;
+public:
 	virtual float IntersectsRay(Ray& ray) = 0;
-	virtual glm::vec3 getAlbedo() = 0;
 	virtual glm::vec3 getNormal(glm::vec3& hitPoint) = 0;
 	virtual void ImGuiParameters() = 0;
 };
@@ -162,10 +178,9 @@ class Sphere : public SceneObject {
 public:
 	glm::vec3 center;
 	float radius;
-	glm::vec3 albedo;
 
 public:
-	Sphere(glm::vec3& center, float radius, glm::vec3& albedo) : center{ center }, radius{ radius }, albedo{ albedo } {};
+	Sphere(glm::vec3& center, float radius) : center{ center }, radius{ radius } {};
 
 	float IntersectsRay(Ray& ray) override {
 		glm::vec3 originMinusCenter = ray.Origin - center;
@@ -183,10 +198,6 @@ public:
 		return closestT;
 	}
 
-	glm::vec3 getAlbedo() override {
-		return albedo;
-	}
-
 	glm::vec3 getNormal(glm::vec3& hitPoint) override {
 		return glm::normalize(hitPoint - center);
 	}
@@ -194,13 +205,15 @@ public:
 	void ImGuiParameters() override {
 		ImGui::DragFloat3("Position", glm::value_ptr(center), 0.1f);
 		ImGui::DragFloat("Radius", &radius, 0.1f);
-		ImGui::ColorEdit3("Albedo", glm::value_ptr(albedo), 0.1f);
+		// need to set an upper bound fro material index but require size of materials vector from scene
+		ImGui::DragInt("Material", &MaterialIndex, 1.0f, 0);
 	}
 };
 
 class Scene {
 public:
 	std::vector<SceneObject*> objects;
+	std::vector<Material> materials;
 	glm::vec3 lightDir;
 
 public:
