@@ -15,10 +15,13 @@ Tasks completed:
 
 ![image](https://github.com/sohaib-nadeem/RayTracing/assets/72913188/eb1d117c-e172-4fe1-9c76-4b6e54065fed)
 
+- Add Materials and Physically Based Rendering
+
+<img width="982" alt="ray_tracing_updated" src="https://github.com/sohaib-nadeem/RayTracing/assets/72913188/27b98e9d-adf3-4a68-9e4a-dc4e86e8f1a8">
+
 ## To Do
 - Move code to gpu using vulkan (in progress)
 - Add support for rendering triangles and 3D meshes
-- Add Materials and Physically Based Rendering
 - Path Tracing
 - Add Emission and Emissive Materials
 - Performance improvements: Multithreading, Fix Slow Code
